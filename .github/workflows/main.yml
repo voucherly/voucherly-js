@@ -1,24 +1,20 @@
-name: Merge to Main
+name: Publish on push
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
-    # The type of runner that the job will run on
+  release:
+    name: publish
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [ 14, 16, 18 ]
-
-    name: Node ${{ matrix.node }} sample
     steps:
-      - uses: actions/checkout@v3
-      - name: Run linting rules and tests
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run test
+          node-version: 16
+          registry-url: https://npm.pkg.github.com/
+      - name: publish
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
