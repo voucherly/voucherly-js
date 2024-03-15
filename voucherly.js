@@ -34,6 +34,27 @@ function Voucherly(publicKey, options = null) {
         }
 
 
+        const _initWalletPayment = function (callback) {
+            return fetch(this.url, {
+                method: "POST"
+            }).then(async response => {
+                if (response.status != 200) {
+                    let result = await response.json();
+
+                    callback(_buildCallbackErrorResponse(result));
+                    return;
+                }
+
+                let result = await response.json();
+                callback(result);
+
+                if (window.top) {
+                    result.event = "transaction-result";
+                    window.top.postMessage(result, "*");
+                }
+            });
+        }
+
         const _initCodePayment = function (code, callback) {
             return fetch(this.url, {
                 method: "POST",
@@ -131,6 +152,9 @@ function Voucherly(publicKey, options = null) {
             var initPaymentFunc;
 
             switch (transaction.checkoutAction) {
+                case "Wallet":
+                    initPaymentFunc = _initWalletPayment;
+                    break;
                 case "Code":
                     initPaymentFunc = _initCodePayment;
                     break;
@@ -149,9 +173,9 @@ function Voucherly(publicKey, options = null) {
 
         const getPaymentGateways = async function () {
 
-            const paymentGateways = await api.getPaymentGateways(paymentId);
+            const paymentGatewaysResponse = await api.getPaymentGateways(paymentId);
 
-            return paymentGateways;
+            return paymentGatewaysResponse;
         }
 
         const getPayment = async function () {
@@ -289,9 +313,9 @@ function VoucherlyApi(publicKey, options = null) {
     const getPaymentGateways = async function (paymentId) {
         const response = await httpClient(`v1/payments/${paymentId}/payment-gateways`);
 
-        const paymentGateways = await response.json();
+        const paymentGatewaysResponse = await response.json();
 
-        return paymentGateways;
+        return paymentGatewaysResponse;
     }
 
     const requestTransaction = async function (paymentId, paymentGatewayId) {
