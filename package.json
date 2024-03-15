@@ -1,6 +1,6 @@
 {
   "name": "@voucherly/voucherly-js",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Voucherly js library to integrate dropin and api-only payments",
   "main": "voucherly.js",
   "scripts": {
