@@ -1,0 +1,50 @@
+{
+  "name": "@voucherly/voucherly-js",
+  "version": "2.0.0",
+  "description": "Loader and TypeScript types for Voucherly.js, the library that renders Voucherly Components on your checkout page",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node scripts/mark-cjs.mjs",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "npm run typecheck",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voucherly/voucherly-js.git"
+  },
+  "keywords": [
+    "voucherly",
+    "voucherly.js",
+    "payments",
+    "checkout",
+    "components",
+    "meal vouchers"
+  ],
+  "author": "Voucherly",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/voucherly/voucherly-js/issues"
+  },
+  "homepage": "https://docs.voucherly.it/en/guides/integrations/components/",
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}
