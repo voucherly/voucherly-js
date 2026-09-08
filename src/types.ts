@@ -122,6 +122,7 @@ export interface Appearance {
 
 export interface PaymentComponentOptions {
     appearance?: Appearance;
+    /** `auto` shows a wallet only when the browser can pay with it, and never while the Express Checkout Component is mounted on the same page. */
     wallets?: {
         applePay?: Visibility;
         googlePay?: Visibility;

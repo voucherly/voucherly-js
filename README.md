@@ -40,13 +40,13 @@ The same library is also available with a plain script tag, without this package
 
 ## Versioning
 
-The major version of this package follows the version in the Voucherly.js path.
+Each major version of this package loads one version of Voucherly.js, identified by the version segment of its path. The two numbers are independent: the table is the mapping.
 
 | `@voucherly/voucherly-js` | Voucherly.js |
 | --- | --- |
 | `2.x` | `https://checkout.voucherly.it/embed/v1/voucherly.js` |
 
-Voucherly.js receives backward-compatible updates on the same path, without any change to your integration. An incompatible change ships on a new path (`/embed/v2/`) together with a new major of this package, and the previous path keeps working.
+Voucherly.js receives backward-compatible updates on the same path, without any change to your integration or to this package. An incompatible change ships on a new path (`/embed/v2/`) together with a new major of this package that loads it, and the previous path keeps working.
 
 ## Documentation
 
