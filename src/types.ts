@@ -49,10 +49,9 @@ export interface ReadyEvent {
 export interface PaymentCompleteEvent {
     success: true;
     paymentId: string;
-    /** Total paid, in cents. Absent when the component resumes after a redirect. */
-    amount?: number;
-    /** Absent when the component resumes after a redirect. */
-    status?: PaymentStatus;
+    /** Total paid, in cents. */
+    amount: number;
+    status: PaymentStatus;
 }
 
 export interface PaymentErrorEvent {
