@@ -43,7 +43,7 @@
   "bugs": {
     "url": "https://github.com/voucherly/voucherly-js/issues"
   },
-  "homepage": "https://docs.voucherly.it/en/guides/integrations/components/",
+  "homepage": "https://docs.voucherly.it/en/guides/online-payments/components/",
   "devDependencies": {
     "typescript": "^5.6.0"
   }
