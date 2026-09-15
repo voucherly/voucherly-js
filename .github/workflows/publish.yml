@@ -1,14 +1,16 @@
 name: Publish to npm
 
+# Started by hand, once the Checkout serves what the types describe: a merge reaching this mirror is not a deploy.
+# The trusted publisher on npmjs.com names this file, so renaming it breaks publishing.
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
 
 jobs:
   publish:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - uses: actions/checkout@v4
@@ -17,17 +19,47 @@ jobs:
           node-version: 22
           cache: npm
           registry-url: https://registry.npmjs.org
-      - name: Check that the release tag matches package.json
+      - name: Read the version to release
+        id: release
         run: |
-          TAG="${GITHUB_REF##*/}"
-          VERSION="${TAG#v}"
-          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
-          if [ "$VERSION" != "$PACKAGE_VERSION" ]; then
-            echo "Release tag $TAG does not match package.json version $PACKAGE_VERSION"
+          set -euo pipefail
+          NAME="$(node -p "require('./package.json').name")"
+          VERSION="$(node -p "require('./package.json').version")"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null; then
+            echo "::error::v$VERSION is already released: bump version in package.json"
             exit 1
           fi
+          awk -v version="$VERSION" '$1 == "##" && $2 == version { found = 1; next } found && /^## / { exit } found { print }' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notes.md"; then
+            echo "::error::CHANGELOG.md has no entry for $VERSION"
+            exit 1
+          fi
+          # A version on npm without its tag is a rerun after the release step failed: the tag goes on the commit npm recorded, not on the current one.
+          if [ -n "$(npm view "$NAME@$VERSION" version 2>/dev/null || true)" ]; then
+            TARGET="$(npm view "$NAME@$VERSION" gitHead)"
+            if [ -z "$TARGET" ]; then
+              echo "::error::$NAME@$VERSION is on npm with no gitHead: tag v$VERSION by hand"
+              exit 1
+            fi
+            PUBLISHED=true
+          else
+            TARGET="$GITHUB_SHA"
+            PUBLISHED=false
+          fi
+          {
+            echo "version=$VERSION"
+            echo "target=$TARGET"
+            echo "published=$PUBLISHED"
+          } >> "$GITHUB_OUTPUT"
       # Trusted publishing (OIDC) needs npm 11.5 or later, newer than the one bundled with Node 22.
       - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run build
-      - run: npm publish --provenance --access public
+      - if: steps.release.outputs.published == 'false'
+        run: npm publish --provenance --access public
+      - name: Tag and create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+          TARGET: ${{ steps.release.outputs.target }}
+        run: gh release create "v$VERSION" --repo "$GITHUB_REPOSITORY" --target "$TARGET" --title "v$VERSION" --notes-file "$RUNNER_TEMP/notes.md"

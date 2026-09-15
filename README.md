@@ -1,7 +1,7 @@
 # Voucherly.js loader
 
 [![npm](https://img.shields.io/npm/v/@voucherly/voucherly-js.svg)](https://www.npmjs.com/package/@voucherly/voucherly-js)
-[![Publish](https://github.com/voucherly/voucherly-js/actions/workflows/publish.yml/badge.svg)](https://github.com/voucherly/voucherly-js/actions?query=event%3Arelease)
+[![Publish](https://github.com/voucherly/voucherly-js/actions/workflows/publish.yml/badge.svg)](https://github.com/voucherly/voucherly-js/actions/workflows/publish.yml)
 
 Loader and TypeScript types for **Voucherly.js**, the library that renders [Voucherly Components](https://docs.voucherly.it/en/guides/online-payments/components/) — a payment form embedded in your own checkout page, with cards, meal vouchers, Apple Pay, Google Pay and every other payment method of your [Voucherly](https://voucherly.it) account.
 
@@ -58,7 +58,7 @@ Voucherly.js receives backward-compatible updates on the same path, without any 
 
 ## Development
 
-This repository is a read-only mirror of the `src/Web/voucherly-js/` folder of the Voucherly platform repository, pushed on every merge. Issues are welcome here; changes land through the platform repository and reach npm with a GitHub release of this mirror.
+This repository is a read-only mirror of the `src/Web/voucherly-js/` folder of the Voucherly platform repository, pushed on every merge. Issues are welcome here; changes land through the platform repository and reach npm through the Publish workflow of this mirror.
 
 ```sh
 npm ci
