@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.1
+
+Voucherly.js moved to its own host.
+
+- `loadVoucherly()` injects `https://js.voucherly.it/embed/v1/voucherly.js`. The script, its API and the iframe served by `checkout.voucherly.it` are unchanged.
+- A Content Security Policy needs `js.voucherly.it` in `script-src`; `frame-src` and `connect-src` stay on `checkout.voucherly.it`.
+
 ## 2.0.0
 
 First release of the Voucherly.js loader.

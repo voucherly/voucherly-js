@@ -5,7 +5,7 @@
 
 Loader and TypeScript types for **Voucherly.js**, the library that renders [Voucherly Components](https://docs.voucherly.it/en/guides/online-payments/components/) — a payment form embedded in your own checkout page, with cards, meal vouchers, Apple Pay, Google Pay and every other payment method of your [Voucherly](https://voucherly.it) account.
 
-This package does not contain Voucherly.js. It injects `https://checkout.voucherly.it/embed/v1/voucherly.js` into the page and resolves with the `Voucherly` global, so your integration always runs the current version of the library. Voucherly.js must be loaded from `checkout.voucherly.it`: do not bundle it and do not host a copy.
+This package does not contain Voucherly.js. It injects `https://js.voucherly.it/embed/v1/voucherly.js` into the page and resolves with the `Voucherly` global, so your integration always runs the current version of the library. Voucherly.js must be loaded from `js.voucherly.it`: do not bundle it and do not host a copy.
 
 ## Installation
 
@@ -38,7 +38,7 @@ By default, once the Payment closes, Voucherly.js sends your page to the `redire
 The same library is also available with a plain script tag, without this package:
 
 ```html
-<script src="https://checkout.voucherly.it/embed/v1/voucherly.js"></script>
+<script src="https://js.voucherly.it/embed/v1/voucherly.js"></script>
 ```
 
 ## Versioning
@@ -47,7 +47,7 @@ Each major version of this package loads one version of Voucherly.js, identified
 
 | `@voucherly/voucherly-js` | Voucherly.js |
 | --- | --- |
-| `2.x` | `https://checkout.voucherly.it/embed/v1/voucherly.js` |
+| `2.x` | `https://js.voucherly.it/embed/v1/voucherly.js` |
 
 Voucherly.js receives backward-compatible updates on the same path, without any change to your integration or to this package. An incompatible change ships on a new path (`/embed/v2/`) together with a new major of this package that loads it, and the previous path keeps working.
 

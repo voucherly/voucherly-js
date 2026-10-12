@@ -1,6 +1,6 @@
 {
   "name": "@voucherly/voucherly-js",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Loader and TypeScript types for Voucherly.js, the library that renders Voucherly Components on your checkout page",
   "type": "module",
   "sideEffects": false,

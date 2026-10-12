@@ -2,10 +2,10 @@ import type { VoucherlyStatic } from "./types.js";
 
 export * from "./types.js";
 
-export const VOUCHERLY_JS_URL = "https://checkout.voucherly.it/embed/v1/voucherly.js";
+export const VOUCHERLY_JS_URL = "https://js.voucherly.it/embed/v1/voucherly.js";
 
 export interface LoadVoucherlyOptions {
-    /** Only for development against a local checkout. Production integrations must load Voucherly.js from checkout.voucherly.it. */
+    /** Only for development against a local checkout. Production integrations must load Voucherly.js from js.voucherly.it. */
     scriptUrl?: string;
 }
 

@@ -1,5 +1,5 @@
 /**
- * Types of the `Voucherly` global exposed by Voucherly.js (https://checkout.voucherly.it/embed/v1/voucherly.js).
+ * Types of the `Voucherly` global exposed by Voucherly.js (https://js.voucherly.it/embed/v1/voucherly.js).
  * Reference: https://docs.voucherly.it/en/guides/online-payments/components/reference/
  */
 
