@@ -184,7 +184,30 @@ export interface ExpressComponentOptions {
     };
 }
 
+export interface PaymentMessagesOptions {
+    /** Merchant publishable key (`pk_live_…` / `pk_sand_…`). Never a secret key. */
+    publicKey: string;
+    /** Where the messages go: a CSS selector or the element itself, close to the price it describes. */
+    container: string | HTMLElement;
+    /** The price the messages describe, in cents. */
+    amount: number;
+    /** Defaults to `EUR`. */
+    currency?: string;
+}
+
+export interface PaymentMessages {
+    /** Changes the price; close updates are grouped, so it can follow a field as the customer types. */
+    update(options: { amount: number }): void;
+    /** Removes the messages from the container. */
+    destroy(): void;
+}
+
 export interface VoucherlyStatic {
+    /**
+     * Shows the official message of each instalment gateway the merchant has active — PayPal Pay Later, Klarna, Scalapay — one under the other.
+     * The text is the provider's own. Nothing is drawn, and no provider script is loaded, for a gateway the merchant lacks or an amount outside its range.
+     */
+    paymentMessages(options: PaymentMessagesOptions): PaymentMessages;
     /** Renders the Payment Component. */
     init(options: VoucherlyInitOptions, componentOptions?: PaymentComponentOptions): void;
     /** Prepares the Payment Component in popup mode: `submit()` opens it. */

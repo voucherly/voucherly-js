@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0
+
+Instalment messages.
+
+- Types for `Voucherly.paymentMessages({ publicKey, container, amount, currency })`, which shows the official message of each instalment gateway the merchant has active — PayPal Pay Later, Klarna, Scalapay — and returns `update({ amount })` and `destroy()`.
+- A Content Security Policy needs `api.voucherly.it` in `connect-src`, and the hosts of the providers the merchant uses: `*.paypal.com` and `*.paypalobjects.com` for PayPal, `js.klarna.com` in `script-src` and `https://*.klarna.com` in `frame-src` for Klarna, `cdn.scalapay.com` for Scalapay.
+
 ## 2.0.1
 
 Voucherly.js moved to its own host.
