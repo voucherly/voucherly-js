@@ -7,8 +7,6 @@ export type ComponentName = "element" | "express";
 
 export type Visibility = "auto" | "never";
 
-export type ExpressVisibility = "always" | "auto" | "never";
-
 /**
  * What happens to your page once the Payment closes.
  * `always` sends it to the `redirectOkUrl` or `redirectKoUrl` of the Payment, with the outcome in the query string, and the component fails to load with `redirect_url_missing` when the Payment has not both.
@@ -112,6 +110,20 @@ export interface VoucherlyInitOptions {
     onPaymentPartialComplete?: (event: PaymentPartialCompleteEvent) => void;
     /** Called when a payment method needs a top-level navigation. Defaults to `window.location.href = url`. */
     onRedirect?: (url: string) => void;
+    /** Called when the customer tries to pay while the component is `locked`: show what is still missing on your page. */
+    onLockedAttempt?: (event: LockedAttemptEvent) => void;
+}
+
+export interface LockedAttemptEvent {
+    /** The payment method the customer tried, when there is one. */
+    paymentGatewayId?: string;
+}
+
+/** `done` once the attempt is over, whatever its outcome: the callbacks report it. `no_method` when no method is chosen, `locked` while the component is locked, `unanswered` when the component did not answer. */
+export type SubmitStatus = "done" | "no_method" | "locked" | "unanswered";
+
+export interface SubmitResult {
+    status: SubmitStatus;
 }
 
 /** The Payment Component opened in a popup by `Voucherly.submit()`: your page is never left, and the outcome is read from Voucherly while the popup is open. */
@@ -133,6 +145,7 @@ export interface VoucherlyPopupInitOptions {
     onPopupClosed?: () => void;
 }
 
+/** Each variable overrides the merchant's branding, which the component starts from. `fontSize` is the root size and scales the whole component. */
 export interface AppearanceVariables {
     colorPrimary?: string;
     colorPrimaryHover?: string;
@@ -152,15 +165,59 @@ export interface Appearance {
     variables?: AppearanceVariables;
 }
 
+/** Apple Pay and Google Pay. `auto` shows a wallet only where the browser can pay with it. */
+export interface WalletGateways {
+    applePay?: Visibility;
+    googlePay?: Visibility;
+}
+
+/** The customer's personal credit and prepaid quota on Voucherly. */
+export interface VoucherlyCustomGateways {
+    wallet?: Visibility;
+    prepaid?: Visibility;
+}
+
+/** Which gateways a component offers. Every one is `auto` by default, which shows it when the merchant has it; `never` leaves it out. */
+export interface PaymentGatewaysOptions<TVoucherly extends VoucherlyCustomGateways = VoucherlyCustomGateways> {
+    wallets?: WalletGateways;
+    voucherlyCustoms?: TVoucherly;
+}
+
+export interface PaymentComponentVoucherlyCustomGateways extends VoucherlyCustomGateways {
+    /** The merchant's manual payment methods, such as cash at the counter. */
+    manual?: Visibility;
+}
+
+/** `auto` lets Voucherly choose the layout; today it is `list`. */
+export type PaymentComponentLayoutType = "auto" | "list";
+
+export interface PaymentComponentLayout {
+    /** Defaults to `auto`. */
+    type?: PaymentComponentLayoutType;
+    /** The radio of every row. `auto` and `always` show it, `if_multiple` only when the component offers more than one method. Defaults to `auto`. */
+    radios?: "auto" | "always" | "never" | "if_multiple";
+    /** Where a gateway's logo goes in its row: `start` right after the radio, `end` at the end. Defaults to `end`. */
+    paymentGatewayLogoPosition?: "start" | "end";
+    /** How many of the other methods show before the row that opens the rest. `0` shows them all. Defaults to `4`. */
+    visibleItemsCount?: number;
+}
+
 export interface PaymentComponentOptions {
     appearance?: Appearance;
-    /** `auto` shows a wallet only when the browser can pay with it, and never while the Express Checkout Component is mounted on the same page. */
-    wallets?: {
-        applePay?: Visibility;
-        googlePay?: Visibility;
-    };
+    /** With the Express Checkout Component on the same page, Apple Pay and Google Pay stay in the Express, and so do personal credit and prepaid quota when the Express shows them. */
+    paymentGateways?: PaymentGatewaysOptions<PaymentComponentVoucherlyCustomGateways>;
+    /** Read when the component is mounted: to change it, mount the component again. Defaults to `auto`. */
+    layout?: PaymentComponentLayoutType | PaymentComponentLayout;
     /** Hide the pay button to submit from your own page with `Voucherly.submit()`. Defaults to `true`. */
     showSubmitButton?: boolean;
+    /** `auto` lets the customer top up personal credit when the merchant allows it. Defaults to `auto`. */
+    walletTopUp?: Visibility;
+    savedPaymentMethods?: {
+        /** `auto` lets the customer remove a saved payment method from the list. Defaults to `auto`. */
+        remove?: Visibility;
+    };
+    /** While `true`, no payment starts from the component, wallets included, and `onLockedAttempt` is called instead. Keep it current with `configure({ locked })`, for example until the customer accepts your terms. Defaults to `false`. */
+    locked?: boolean;
 }
 
 export type WalletButtonType = "buy" | "pay" | "plain" | (string & {});
@@ -173,15 +230,11 @@ export interface ExpressComponentOptions {
         applePay?: WalletButtonType;
         googlePay?: WalletButtonType;
     };
-    /** Whatever the Express Checkout Component shows, the Payment Component on the same page leaves out. */
-    paymentMethods?: {
-        /** `auto` shows the method only when it covers the whole remaining amount. Defaults to `always`. */
-        wallet?: ExpressVisibility;
-        /** `auto` shows the method only when it covers the whole remaining amount. Defaults to `always`. */
-        prepaid?: ExpressVisibility;
-        applePay?: Visibility;
-        googlePay?: Visibility;
-    };
+    /**
+     * Whatever the Express Checkout Component shows, the Payment Component on the same page leaves out.
+     * `auto` shows personal credit and prepaid quota only when they cover the whole remaining amount: a partial payment stays in the Payment Component.
+     */
+    paymentGateways?: PaymentGatewaysOptions;
 }
 
 export interface PaymentMessagesOptions {
@@ -220,8 +273,9 @@ export interface VoucherlyStatic {
     /**
      * Submits the Payment Component from your own page, typically with `showSubmitButton: false`.
      * In popup mode it opens the popup, so call it from a user gesture such as the click handler of your pay button, or the browser blocks it.
+     * The promise settles when the component has handled the submission, so your button can show it is busy until then.
      */
-    submit(): void;
+    submit(): Promise<SubmitResult>;
     /** Removes both components. */
     destroy(): void;
     destroyComponent(name: ComponentName): void;
