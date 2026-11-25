@@ -112,11 +112,18 @@ export interface VoucherlyInitOptions {
     onRedirect?: (url: string) => void;
     /** Called when the customer tries to pay while the component is `locked`: show what is still missing on your page. */
     onLockedAttempt?: (event: LockedAttemptEvent) => void;
+    /** Called when the customer approves Google Pay or Apple Pay in the wallet's own sheet, and again if that payment ends without leaving the page. Let your own pay button wait with it. */
+    onProcessing?: (event: ProcessingEvent) => void;
 }
 
 export interface LockedAttemptEvent {
     /** The payment method the customer tried, when there is one. */
     paymentGatewayId?: string;
+}
+
+export interface ProcessingEvent {
+    /** `true` while the approved wallet payment goes on, `false` once it ends on the page, as after an error. A payment that leaves the page sends no `false`. */
+    processing: boolean;
 }
 
 /** `done` once the attempt is over, whatever its outcome: the callbacks report it. `no_method` when no method is chosen, `locked` while the component is locked, `unanswered` when the component did not answer. */
